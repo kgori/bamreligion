@@ -2,7 +2,6 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 if [ ! -d $DIR/bamtools/src ]; then
-    cd $DIR/bamtools
     git submodule init
     git submodule update
 fi
