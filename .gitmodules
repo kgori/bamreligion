@@ -1,0 +1,3 @@
+[submodule "deps/bamtools"]
+	path = deps/bamtools
+	url = git@github.com:TransmissibleCancerGroup/bamtools.git
