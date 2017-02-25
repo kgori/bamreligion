@@ -13,15 +13,22 @@ if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
         link_directories(${Boost_LIBRARY_DIR_DEBUG})
+        link_libraries(
+                ${Boost_SYSTEM_LIBRARY_DEBUG}
+                ${Boost_FILESYSTEM_LIBRARY_DEBUG}
+                ${Boost_PROGRAM_OPTIONS_LIBRARY_DEBUG})
     ELSE()
         link_directories(${Boost_LIBRARY_DIR_RELEASE})
+        link_libraries(
+                ${Boost_SYSTEM_LIBRARY_RELEASE}
+                ${Boost_FILESYSTEM_LIBRARY_RELEASE}
+                ${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE})
     ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 
 endif()
 
-
 set(SOURCE_FILES src/main.cpp src/PileupUtils.cpp src/BamfileIO.cpp deps/bamtools/src/utils/bamtools_pileup_engine.cpp)
 include_directories(deps/bamtools/include deps/bamtools/src)
 link_directories(deps/bamtools/lib)
-link_libraries(bamtools boost_filesystem-mt boost_system-mt boost_program_options-mt)
+link_libraries(bamtools)
 add_executable(bamreligion ${SOURCE_FILES})
