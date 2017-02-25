@@ -11,7 +11,7 @@
 
 ClosingBamReader::ClosingBamReader(const boost::filesystem::path filename) {
     if (!this->Open(filename.string())) {
-        std::__1::cerr << "Couldn't open " << filename << " for reading" << std::__1::endl;
+        std::cerr << "Couldn't open " << filename << " for reading" << std::endl;
     }
 }
 
@@ -22,7 +22,7 @@ ClosingBamReader::~ClosingBamReader() {
 
 ClosingBamWriter::ClosingBamWriter(const boost::filesystem::path filename, const BamTools::SamHeader &header, const BamTools::RefVector &refs) {
         if (!this->Open(filename.string(), header, refs)) {
-            std::__1::cerr << "Couldn't open " << filename << " for writing" << std::__1::endl;
+            std::cerr << "Couldn't open " << filename << " for writing" << std::endl;
         }
         this->filename = filename.string();
     }
@@ -40,13 +40,13 @@ const std::string & ClosingBamWriter::GetFilename() {
 }
 
 
-ClosingBamMultiReader::ClosingBamMultiReader(const std::__1::vector<boost::filesystem::path> filenames) {
-    std::__1::vector<std::__1::string> sfilenames;
+ClosingBamMultiReader::ClosingBamMultiReader(const std::vector<boost::filesystem::path> filenames) {
+    std::vector<std::string> sfilenames;
     for (auto filename : filenames) {
         sfilenames.push_back(filename.string());
     }
     if (!this->Open(sfilenames)) {
-        std::__1::cerr << "Couldn't open files for reading" << std::__1::endl;
+        std::cerr << "Couldn't open files for reading" << std::endl;
     }
 }
 
