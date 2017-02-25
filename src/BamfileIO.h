@@ -6,8 +6,8 @@
 #include <api/BamMultiReader.h>
 #include <api/BamReader.h>
 
-#ifndef SIDEKICK_BAMFILEIO_H
-#define SIDEKICK_BAMFILEIO_H
+#ifndef _BAMFILEIO_H
+#define _BAMFILEIO_H
 
 class ClosingBamReader : public BamTools::BamReader {
 public:
@@ -32,4 +32,4 @@ public:
     ~ClosingBamMultiReader();
 };
 
-#endif //SIDEKICK_BAMFILEIO_H
+#endif //_BAMFILEIO_H

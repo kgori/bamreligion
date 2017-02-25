@@ -6,8 +6,8 @@
 #include <api/BamReader.h>
 #include <utils/bamtools_pileup_engine.h>
 
-#ifndef SIDEKICK_PILEUPUTILS_H
-#define SIDEKICK_PILEUPUTILS_H
+#ifndef _PILEUPUTILS_H
+#define _PILEUPUTILS_H
 
 struct Region {
     Region(unsigned long r, unsigned long s, unsigned long e): ref_id(r), start(s), end(e) {}
@@ -38,6 +38,4 @@ private:
     unsigned long nreads = 0;
 };
 
-bool overlaps(const BamTools::BamAlignment &read, const Region &region, bool use_mate_info);
-
-#endif //SIDEKICK_PILEUPUTILS_H
+#endif //_PILEUPUTILS_H
