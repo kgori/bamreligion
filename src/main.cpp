@@ -1,5 +1,4 @@
 #include <iostream>
-#include <string>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <api/BamReader.h>
@@ -7,10 +6,8 @@
 #include "api/BamWriter.h"
 #include "BamfileIO.h"
 #include "PileupUtils.h"
-#include <utils/bamtools_pileup_engine.h>
 #include <future>
 #include <iomanip>
-#include <memory>
 #include <unordered_set>
 
 using namespace BamTools;
@@ -68,7 +65,7 @@ bool passes_initial_checks(const BamAlignment &r) {
 
 double avg_base_quality(const BamAlignment &r) {
     double totalqual = 0;
-    for (unsigned int basequal : r.Qualities) {
+    for (char & basequal : r.Qualities) {
         totalqual += basequal - 33;
     }
     return totalqual / r.Qualities.length();
@@ -172,7 +169,7 @@ int main(int argc, char** argv) {
     po::variables_map vm;
 
     try {
-        po::store(po::parse_command_line(argc, argv, desc), vm); // can throw
+        po::store(po::parse_command_line(argc, (const char *const *) argv, desc), vm); // can throw
         /**
         --help option
         */
@@ -329,11 +326,11 @@ int main(int argc, char** argv) {
         PileupEngine pileup(true);
         pileup.AddVisitor(visitor.get());
         filter_results[0].get();
-        ClosingBamReader reader(tmp_mapped_filtered);
-        reader.CreateIndex();
-        std::cout << "Piling up " << reader.GetFilename() << std::endl;
+        ClosingBamReader pileup_reader(tmp_mapped_filtered);
+        pileup_reader.CreateIndex();
+        std::cout << "Piling up " << pileup_reader.GetFilename() << std::endl;
         BamAlignment read;
-        while (reader.GetNextAlignmentCore(read)) {
+        while (pileup_reader.GetNextAlignmentCore(read)) {
             pileup.AddAlignment(read);
             //std::cout << "\t" << read.RefID << "\t" << read.Position << std::endl;
         }
