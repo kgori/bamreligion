@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.7)
-project(sidekick)
+project(bamreligion)
 
 if(NOT "${CMAKE_SOURCE_DIR}/deps/bamtools/include/api/BamAlignment.h")
     execute_process(COMMAND ${CMAKE_SOURCE_DIR}/build_deps.sh)
@@ -27,8 +27,12 @@ if(Boost_FOUND)
 
 endif()
 
-set(SOURCE_FILES src/main.cpp src/PileupUtils.cpp src/BamfileIO.cpp deps/bamtools/src/utils/bamtools_pileup_engine.cpp)
-include_directories(deps/bamtools/include deps/bamtools/src)
+set(SOURCE_FILES
+        src/main.cpp src/PileupUtils.cpp src/BamfileIO.cpp src/Utils.cpp
+        deps/bamtools/src/utils/bamtools_pileup_engine.cpp)
+include_directories(deps/bamtools/include deps/bamtools/src src)
 link_directories(deps/bamtools/lib)
 link_libraries(bamtools)
 add_executable(bamreligion ${SOURCE_FILES})
+
+add_subdirectory(tests)

@@ -11,7 +11,7 @@
 
 ClosingBamReader::ClosingBamReader(const boost::filesystem::path filename) {
     if (!this->Open(filename.string())) {
-        std::cerr << "Couldn't open " << filename << " for reading" << std::endl;
+        std::cerr << "Couldn't open " << boost::filesystem::system_complete(filename) << " for reading" << std::endl;
     }
 }
 
@@ -41,6 +41,7 @@ const std::string & ClosingBamWriter::GetFilename() {
 
 
 ClosingBamMultiReader::ClosingBamMultiReader(const std::vector<boost::filesystem::path> filenames) {
+    assert(SetExplicitMergeOrder(MergeOrder::MergeByCoordinate));
     std::vector<std::string> sfilenames;
     for (auto filename : filenames) {
         sfilenames.push_back(filename.string());

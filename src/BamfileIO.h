@@ -2,9 +2,10 @@
 // Created by Kevin Gori on 24/02/2017.
 //
 #include <boost/filesystem.hpp>
-#include "api/BamWriter.h"
-#include <api/BamMultiReader.h>
 #include <api/BamReader.h>
+#include <api/BamMultiReader.h>
+#include <api/BamWriter.h>
+
 
 #ifndef _BAMFILEIO_H
 #define _BAMFILEIO_H
