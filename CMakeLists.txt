@@ -7,6 +7,10 @@ endif()
 
 set(CMAKE_CXX_STANDARD 14)
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+link_libraries(Threads::Threads)
+
 find_package(Boost 1.50.0 COMPONENTS filesystem system program_options)
 
 if(Boost_FOUND)
