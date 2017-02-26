@@ -142,26 +142,26 @@ int main(int argc, char** argv) {
     fs::path tmp_both_1 = working_dir / fs::path("tmp_both_1.bam");
     fs::path tmp_both_2 = working_dir / fs::path("tmp_both_2.bam");
     fs::path tmp_mapped_filtered = working_dir / fs::path("tmp_mapped_filtered.bam");
-    fs::path tmp_unmapped_filtered = working_dir / fs::path("tmp_unmapped_filtered.bam");
+//    fs::path tmp_unmapped_filtered = working_dir / fs::path("tmp_unmapped_filtered.bam");
     fs::path tmp_both_1_filtered = working_dir / fs::path("tmp_both_1_filtered.bam");
     fs::path tmp_both_2_filtered = working_dir / fs::path("tmp_both_2_filtered.bam");
 
     // Set option limits
-    if (MAPQUAL < 1) {
-        auto t = std::time(nullptr);
-        auto tm = *std::localtime(&t);
-        std::cerr << "[" << std::put_time(&tm, "%d-%m-%Y %H:%M:%S") << "] "
-                  << "Warning - value of " << MAPQUAL << "set to minimum of 1"
-                  << std::endl;
-    }
-
-    if (MAPQUAL < 0) {
-        auto t = std::time(nullptr);
-        auto tm = *std::localtime(&t);
-        std::cerr << "[" << std::put_time(&tm, "%d-%m-%Y %H:%M:%S") << "] "
-                  << "Warning - value of " << MAPQUAL << "set to minimum of 1"
-                  << std::endl;
-    }
+//    if (MAPQUAL < 1) {
+//        auto t = std::time(nullptr);
+//        auto tm = *std::localtime(&t);
+//        std::cerr << "[" << std::put_time(&tm, "%d-%m-%Y %H:%M:%S") << "] "
+//                  << "Warning - value of " << MAPQUAL << "set to minimum of 1"
+//                  << std::endl;
+//    }
+//
+//    if (MAPQUAL < 0) {
+//        auto t = std::time(nullptr);
+//        auto tm = *std::localtime(&t);
+//        std::cerr << "[" << std::put_time(&tm, "%d-%m-%Y %H:%M:%S") << "] "
+//                  << "Warning - value of " << MAPQUAL << "set to minimum of 1"
+//                  << std::endl;
+//    }
 
     log_warning(BASEQUAL, "BASEQUAL", 0);
     log_warning(MINCOV, "MINCOV", 1);
@@ -191,7 +191,7 @@ int main(int argc, char** argv) {
         ClosingBamWriter debug(working_dir / fs::path("debug.bam"), header, references);
 
 
-        std::cout << "Scanning " << reader.GetFilename() << " for unmapped reads" << std::endl;
+        std::cout << "Scanning " << reader.GetFilename() << " for unmapped reads\n" << std::endl;
         int nreads = 0;
 
         BamAlignment read;
@@ -239,11 +239,11 @@ int main(int argc, char** argv) {
 //                  << counts[5] << std::endl;
     }
 
-    std::vector<std::future<void>> filter_results;
+    std::vector<std::future<int>> filter_results;
     filter_results.push_back(
             std::async(filter_bam, tmp_unmapped, tmp_mapped, working_dir, tmp_mapped_filtered, 1000000));
-    filter_results.push_back(
-            std::async(filter_bam, tmp_mapped, tmp_unmapped, working_dir, tmp_unmapped_filtered, 1000000));
+//    filter_results.push_back(
+//            std::async(filter_bam, tmp_mapped, tmp_unmapped, working_dir, tmp_unmapped_filtered, 1000000));
     filter_results.push_back(
             std::async(filter_bam, tmp_both_1, tmp_both_2, working_dir, tmp_both_2_filtered, 1000000));
     filter_results.push_back(
@@ -256,7 +256,7 @@ int main(int argc, char** argv) {
     {
         PileupEngine pileup(true);
         pileup.AddVisitor(visitor.get());
-        filter_results[0].get();
+        filter_results[0].get();  // this result needs to be ready now
         ClosingBamReader pileup_reader(tmp_mapped_filtered);
         pileup_reader.CreateIndex();
         std::cout << "Piling up " << pileup_reader.GetFilename() << std::endl;
@@ -281,12 +281,16 @@ int main(int argc, char** argv) {
     for (auto it = std::next(filter_results.begin()); it != filter_results.end(); it++) {
         (*it).get();
     }
+      // Replace this with a final filter_bam call
+//    std::cout << "Writing " << write_overlaps(tmp_unmapped_filtered, hu_out, visitor->regions)
+//              << " half-unmapped reads tied to high coverage areas" << std::endl;
 
-    std::cout << "Writing " << write_overlaps(tmp_unmapped_filtered, hu_out, visitor->regions)
-              << " half-unmapped reads tied to high coverage areas" << std::endl;
-
-    std::cout << "Writing " << write_overlaps(tmp_mapped_filtered, hm_out, visitor->regions)
+    std::cout << "Wrote " << write_overlaps(tmp_mapped_filtered, hm_out, visitor->regions)
               <<" half-mapped reads tied to high coverage areas" << std::endl;
+
+    // One last filter
+    std::cout << "Wrote " << filter_bam(hm_out, tmp_unmapped, working_dir, hu_out, 1000000)
+              << " half-unmapped reads tied to high coverage areas" << std::endl;
 
     std::vector<fs::path> paths{tmp_both_1_filtered, tmp_both_2_filtered};
     ClosingBamMultiReader consolidate_unmapped_reader(paths);
@@ -298,7 +302,7 @@ int main(int argc, char** argv) {
         consolidate_unmapped_writer.SaveAlignment(read);
         n++;
     }
-    std::cout << "Writing " << n << " both-unmapped reads to "
+    std::cout << "Wrote " << n << " both-unmapped reads to "
               << consolidate_unmapped_writer.GetFilename() << std::endl;
 
     if (delete_wdir) {

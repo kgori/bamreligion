@@ -9,11 +9,11 @@
 namespace fs = boost::filesystem;
 
 TEST(test, test_filter_bam) {
-    filter_bam(fs::path("../data/query.bam"),
-               fs::path("../data/subject.bam"),
-               fs::path("."),
-               fs::path("../data/result.bam"),
-               5);
+    int written = filter_bam(fs::path("../data/query.bam"),
+                             fs::path("../data/subject.bam"),
+                             fs::path("."),
+                             fs::path("../data/result.bam"),
+                             5);
 
     std::vector<std::string> names;
     ClosingBamReader checker(fs::path("../data/result.bam"));
@@ -23,6 +23,9 @@ TEST(test, test_filter_bam) {
     }
     fs::remove(fs::path("../data/result.bam"));
 
+    ASSERT_EQ(written, 7);  // Expecting 7 reads written
+
+    // This is the expected order the reads should come out
     ASSERT_STREQ(names[0].c_str(), "SOLEXA-1GA-2_2_FC20EMB:5:195:284:685");
     ASSERT_STREQ(names[1].c_str(), "SOLEXA-1GA-2_2_FC20EMB:5:35:583:827");
     ASSERT_STREQ(names[2].c_str(), "SOLEXA-1GA-2_2_FC20EMB:5:248:130:724");

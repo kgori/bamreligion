@@ -9,7 +9,7 @@
 
 using namespace BamTools;
 
-void filter_bam(boost::filesystem::path query, boost::filesystem::path subject, boost::filesystem::path tmpdir, boost::filesystem::path outfile, int at_a_time) {
+int filter_bam(boost::filesystem::path query, boost::filesystem::path subject, boost::filesystem::path tmpdir, boost::filesystem::path outfile, int at_a_time) {
     std::vector<boost::filesystem::path> tmpfiles;
 
     ClosingBamReader query_reader(query);
@@ -70,4 +70,5 @@ void filter_bam(boost::filesystem::path query, boost::filesystem::path subject, 
         boost::filesystem::remove(path.string() + ".bai");
     }
     std::cout << "[filter_bam] - wrote " << written << " filtered reads" << std::endl;
+    return written;
 }
