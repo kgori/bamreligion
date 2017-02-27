@@ -216,15 +216,17 @@ unsigned long initial_extraction(ClosingBamReader &reader, const FilePaths &path
             std::cout << "Read " << nreads << " reads\r";
             std::flush(std::cout);
         }
-        if (nreads % (update_freq*50) == 0) {
-            std::cout << "\n[initial_extraction] [" << time_now() << "]" << std::endl;
+        if (nreads % (update_freq*5) == 0) {
+            std::cout << "\n[initial_extraction] [" << time_now() << "]"
+                      << " found " << nfiltered << " unmapped reads"
+                      << std::endl;
         }
 
         if (passes_initial_checks(read)) {
+            nfiltered++;
             read.BuildCharData();
             if (write_filtered) {
                 filtered_writer.SaveAlignment(read);
-                nfiltered++;
             }
 
             if (passes_quality_checks(read, base_qual, map_qual)) { // At least one of pair is unmapped
@@ -246,6 +248,9 @@ unsigned long initial_extraction(ClosingBamReader &reader, const FilePaths &path
             }
         }
     }
+    std::cout << "\n[initial_extraction] [" << time_now() << "]"
+              << " Finished. Found " << nfiltered << " unmapped reads"
+              << std::endl;
     return nfiltered;
 }
 
@@ -411,15 +416,11 @@ int main(int argc, char** argv) {
         std::cout << "Wrote " << n_both_unmapped << " both-unmapped reads to "
                   << filepaths.bothunmapped << std::endl;
 
-        if (nfiltered > 0) {
+        if (write_filtered) {
             std::cout << "Wrote " << nfiltered << " filtered reads to "
                       << filepaths.filtered << std::endl;
         }
 
-//        if (delete_wdir) {
-//            std::cout << "Cleaning up " << filepaths.working_dir << std::endl;
-//            fs::remove_all(filepaths.working_dir);
-//        }
         return 0;
     }
     catch (FilePathException &e) {
