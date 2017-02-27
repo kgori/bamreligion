@@ -8,9 +8,13 @@
 #include "Utils.h"
 
 using namespace BamTools;
+namespace fs = boost::filesystem;
 
-int filter_bam(boost::filesystem::path query, boost::filesystem::path subject, boost::filesystem::path tmpdir, boost::filesystem::path outfile, int at_a_time) {
-    std::vector<boost::filesystem::path> tmpfiles;
+int filter_bam(fs::path query, fs::path subject, fs::path tmpdir, fs::path outfile, int at_a_time) {
+    std::cout << "[filter_bam] - filtering " << subject.string()
+              << " for reads with mates in " << query.string()
+              << std::endl;
+    std::vector<fs::path> tmpfiles;
 
     ClosingBamReader query_reader(query);
     std::unordered_set<std::string> cache;
@@ -35,7 +39,8 @@ int filter_bam(boost::filesystem::path query, boost::filesystem::path subject, b
         ClosingBamReader subject_reader(subject);
 
         // Open writer for this iteration
-        boost::filesystem::path tmpfilename = tmpdir / boost::filesystem::unique_path();
+        auto stem = subject.stem().string();
+        fs::path tmpfilename = tmpdir / fs::unique_path(stem + "_%%%%_%%%%.bam");
         tmpfiles.push_back(tmpfilename);
         ClosingBamWriter batch_writer(tmpfilename, subject_reader.GetConstSamHeader(),
                                       subject_reader.GetReferenceData());
@@ -67,7 +72,7 @@ int filter_bam(boost::filesystem::path query, boost::filesystem::path subject, b
     }
     for (auto &path : tmpfiles) {
         remove(path);
-        boost::filesystem::remove(path.string() + ".bai");
+        fs::remove(path.string() + ".bai");
     }
     std::cout << "[filter_bam] - wrote " << written << " filtered reads" << std::endl;
     return written;
