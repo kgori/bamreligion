@@ -128,8 +128,6 @@ template <typename Type>
 void log_warning(Type &variable, const std::string &variable_name, const Type minval) {
     if (variable < minval) {
         variable = minval;
-        auto t = time(nullptr);
-        auto tm = *localtime(&t);
         std::cerr << "[" << time_now() << "] "
                   << "Warning - value of " << variable_name << " set to minimum of "
                   << minval << std::endl;
@@ -197,9 +195,9 @@ unsigned long initial_extraction(ClosingBamReader &reader, const FilePaths &path
     ClosingBamWriter tmp_unmapped_writer(paths.tmp_unmapped, header, references);
     ClosingBamWriter tmp_both_1_writer(paths.tmp_both_1, header, references);
     ClosingBamWriter tmp_both_2_writer(paths.tmp_both_2, header, references);
-    ClosingBamWriter filtered_writer;
+    std::unique_ptr<ClosingBamWriter> filtered_writer;
     if (write_filtered) {
-        ClosingBamWriter filtered_writer(paths.filtered, header, references);
+        filtered_writer = std::make_unique<ClosingBamWriter>(paths.filtered, header, references);
     }
 
 
@@ -225,8 +223,8 @@ unsigned long initial_extraction(ClosingBamReader &reader, const FilePaths &path
         if (passes_initial_checks(read)) {
             nfiltered++;
             read.BuildCharData();
-            if (write_filtered) {
-                filtered_writer.SaveAlignment(read);
+            if (write_filtered && filtered_writer) {
+                filtered_writer->SaveAlignment(read);
             }
 
             if (passes_quality_checks(read, base_qual, map_qual)) { // At least one of pair is unmapped

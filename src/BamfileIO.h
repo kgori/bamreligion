@@ -18,7 +18,6 @@ public:
 
 class ClosingBamWriter : public BamTools::BamWriter {
 public:
-    ClosingBamWriter() : filename("") {}
     ClosingBamWriter(const boost::filesystem::path filename,
                      const BamTools::SamHeader &header,
                      const BamTools::RefVector &refs);
